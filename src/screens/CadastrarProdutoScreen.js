@@ -22,12 +22,22 @@ export default function CadastrarProdutoScreen({ navigation }) {
         `INSERT INTO produtos (nome_produto, estoque_seguranca, estoque_minimo, data_cadastro) 
         VALUES (?, ?, ?, ?);`,
         [descricaoProduto, parseInt(estoqueSeguranca), parseInt(estoqueMinimo), dataAtual],
-        () => {
-          Alert.alert('Sucesso', 'Produto cadastrado com sucesso!');
-          // Limpar os campos após o cadastro
-          setDescricaoProduto('');
-          setEstoqueSeguranca('');
-          setEstoqueMinimo('');
+        (_, { insertId }) => {
+          // Após inserir o produto, insira também na tabela estoque_atual
+          transaction.executeSql(
+            `INSERT INTO estoque_atual (id_produto, estoque_atual, data) VALUES (?, ?, ?);`,
+            [insertId, 0, dataAtual], // Estoque atual inicialmente 0
+            () => {
+              Alert.alert('Sucesso', 'Produto cadastrado com sucesso!');
+              // Limpar os campos após o cadastro
+              setDescricaoProduto('');
+              setEstoqueSeguranca('');
+              setEstoqueMinimo('');
+            },
+            (_, error) => {
+              Alert.alert('Erro', 'Erro ao cadastrar produto: ' + error);
+            }
+          );
         },
         (_, error) => {
           Alert.alert('Erro', 'Erro ao cadastrar produto: ' + error);

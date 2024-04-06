@@ -13,22 +13,22 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.buttonText}>Editar Produto</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AlterarEstoque')}>
-        <Text style={styles.buttonText}>Alterar Estoque</Text>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AtualizarEstoque')}>
+        <Text style={styles.buttonText}>Atualizar Estoque</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ListarProdutos')}>
         <Text style={styles.buttonText}>Listar Produtos</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ExcluirProduto')}>
+        <Text style={styles.buttonText}>Excluir Produto</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('GerarRelatorios')}>
         <Text style={styles.buttonText}>Gerar Relatórios</Text>
       </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastrarProduto')}>
-        <Text style={styles.buttonText}>Cadastrar Produto</Text>
-      </TouchableOpacity>
-
+      
     </View>
   );
 }

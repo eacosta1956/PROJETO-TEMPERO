@@ -34,4 +34,19 @@ export function criaTabelas() {
         (_, error) => console.log('Erro ao criar tabela entrada_saida: ' + error)
         );
     });
+
+     // Criar a tabela entrada_saida
+     db.transaction(transaction => {
+        transaction.executeSql(`CREATE TABLE IF NOT EXISTS estoque_atual (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_produto INTEGER,
+            estoque_atual INTEGER,
+            data TEXT,
+            FOREIGN KEY (id_produto) REFERENCES entrada_saida(id_produto)
+        );`,
+        [],
+        () => console.log('Tabela estoque atual criada com sucesso.'),
+        (_, error) => console.log('Erro ao criar tabela estoque atual: ' + error)
+        );
+    });
 };

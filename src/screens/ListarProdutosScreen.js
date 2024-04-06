@@ -12,7 +12,9 @@ export default function ListarProdutosScreen() {
   const carregarProdutos = () => {
     db.transaction((transaction) => {
       transaction.executeSql(
-        `SELECT nome_produto, estoque_seguranca, estoque_minimo, data_cadastro FROM produtos;`,
+        `SELECT p.nome_produto, p.estoque_seguranca, p.estoque_minimo, p.data_cadastro, e.estoque_atual 
+        FROM produtos AS p 
+        LEFT JOIN estoque_atual AS e ON p.id_produto = e.id_produto;`,
         [],
         (_, { rows }) => {
           const produtosList = rows._array; // Convertendo os resultados em um array
@@ -28,6 +30,7 @@ export default function ListarProdutosScreen() {
   const renderItem = ({ item }) => (
     <View style={styles.item}>
       <Text>Nome: {item.nome_produto}</Text>
+      <Text>Estoque Atual: {item.estoque_atual}</Text>
       <Text>Estoque Segurança: {item.estoque_seguranca}</Text>
       <Text>Estoque Mínimo: {item.estoque_minimo}</Text>
       <Text>Data Cadastro: {item.data_cadastro}</Text>
@@ -58,4 +61,3 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
 });
-
