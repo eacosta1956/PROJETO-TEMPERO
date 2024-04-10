@@ -9,7 +9,7 @@ export function criaTabelas() {
             volume_ou_peso REAL,
             unidade_medida TEXT,
             data_cadastro TEXT,
-            figura TEXT,
+            tipo_produto TEXT,
             estoque_seguranca INTEGER,
             estoque_minimo INTEGER
         );`,

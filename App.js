@@ -8,6 +8,7 @@ import ListarProdutosScreen from './src/screens/ListarProdutosScreen';
 import AtualizarEstoqueScreen from './src/screens/AtualizarEstoqueScreen';
 import ExcluirProdutoScreen from './src/screens/ExcluirProdutoScreen';
 import GerarRelatoriosScreen from './src/screens/GerarRelatoriosScreen';
+import ConsultarBancoScreen from './src/screens/ConsultarBancoScreen';
 import { criaTabelas } from './src/database/ControleEstoque';
 
 // Configuração da navegação
@@ -29,6 +30,7 @@ export default function App() {
         <Stack.Screen name="AtualizarEstoque" component={AtualizarEstoqueScreen} />
         <Stack.Screen name="ExcluirProduto" component={ExcluirProdutoScreen} />
         <Stack.Screen name="GerarRelatorios" component={GerarRelatoriosScreen} />
+        <Stack.Screen name="ConsultarBanco" component={ConsultarBancoScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

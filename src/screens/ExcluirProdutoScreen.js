@@ -1,59 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Modal, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, Modal, StyleSheet } from 'react-native';
 import { db } from '../database/SQLite';
+import { useFocusEffect } from '@react-navigation/native';
 
-export default function ExcluirProdutoScreen({ navigation }) {
-  const [nomeProduto, setNomeProduto] = useState('');
-  const [idProduto, setIdProduto] = useState('');
+export default function ExcluirProdutoScreen({ route, navigation }) {
+  const [produto, setProduto] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    if (nomeProduto.trim() !== '') {
-      buscarIdProduto();
+    // Obter o produto passado pela navegação
+    if (route.params && route.params.produto) {
+      setProduto(route.params.produto);
     }
-  }, [nomeProduto]);
-
-  const buscarIdProduto = () => {
-    db.transaction((transaction) => {
-      transaction.executeSql(
-        `SELECT id_produto FROM produtos WHERE nome_produto LIKE ? LIMIT 1;`,
-        [nomeProduto],
-        (_, { rows }) => {
-          if (rows.length > 0) {
-            setIdProduto(rows.item(0).id_produto.toString());
-          } else {
-            setIdProduto('Produto não encontrado');
-          }
-        },
-        (_, error) => {
-          Alert.alert('Erro', 'Erro ao buscar ID do produto: ' + error);
-        }
-      );
-    });
-  };
+  }, [route.params]);
 
   const confirmarExclusao = () => {
     setModalVisible(true);
   };
 
   const excluirProduto = () => {
+    if (!produto) {
+      Alert.alert('Erro', 'Produto não encontrado.');
+      return;
+    }
+
     db.transaction((transaction) => {
       transaction.executeSql(
         `DELETE FROM produtos WHERE id_produto = ?;`,
-        [idProduto],
-        () => {
-          transaction.executeSql(
-            `DELETE FROM estoque_atual WHERE id_produto = ?;`,
-            [idProduto],
-            () => {
-              Alert.alert('Sucesso', 'Produto excluído com sucesso!');
-              setModalVisible(false);
-              navigation.goBack(); // Volta para a tela anterior
-            },
-            (_, error) => {
-              Alert.alert('Erro', 'Erro ao excluir produto do estoque atual: ' + error);
-            }
-          );
+        [produto.id_produto],
+        (_, { rowsAffected }) => {
+          if (rowsAffected > 0) {
+            transaction.executeSql(
+              `DELETE FROM estoque_atual WHERE id_produto = ?;`,
+              [produto.id_produto],
+              (_, { rowsAffected: rowsAffectedEstoque }) => {
+                if (rowsAffectedEstoque > 0) {
+                  Alert.alert('Sucesso', 'Produto excluído com sucesso!');
+                  setModalVisible(false);
+                  navigation.goBack(); // Volta para a tela anterior
+                } else {
+                  Alert.alert('Erro', 'Erro ao excluir produto do estoque atual.');
+                }
+              },
+              (_, error) => {
+                Alert.alert('Erro', 'Erro ao excluir produto do estoque atual: ' + error);
+              }
+            );
+          } else {
+            Alert.alert('Erro', 'Erro ao excluir produto.');
+          }
         },
         (_, error) => {
           Alert.alert('Erro', 'Erro ao excluir produto: ' + error);
@@ -64,13 +59,18 @@ export default function ExcluirProdutoScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Digite o nome do produto"
-        value={nomeProduto}
-        onChangeText={(text) => setNomeProduto(text)}
-      />
-      <Text>ID do Produto: {idProduto}</Text>
+      <View>
+        {produto && (
+          <>
+            <Text>Nome do Produto: {produto.nome_produto}</Text>
+            <Text>ID do Produto: {produto.id_produto}</Text>
+            <Text>Estoque Atual: {produto.estoque_atual}</Text>
+            <Text>Estoque Segurança: {produto.estoque_seguranca}</Text>
+            <Text>Estoque Mínimo: {produto.estoque_minimo}</Text>
+          </>
+        )}
+      </View>
+
       <TouchableOpacity style={styles.button} onPress={confirmarExclusao}>
         <Text style={styles.buttonText}>Excluir Produto</Text>
       </TouchableOpacity>
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '80%',
-    marginTop: 20,
+    marginTop: 30,
     padding: 10,
     backgroundColor: '#3498db',
     borderRadius: 5,
